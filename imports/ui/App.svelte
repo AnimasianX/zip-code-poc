@@ -16,6 +16,32 @@
 
   }
 
+  const showLocation = (position) =>{
+    var latitude = position.coords.latitude;
+            var longitude = position.coords.longitude;
+            alert("Latitude : " + latitude + " Longitude: " + longitude);
+  }
+
+  const errorHandler = () =>{
+    if(err.code == 1) {
+               alert("Error: Access is denied!");
+            } else if( err.code == 2) {
+               alert("Error: Position is unavailable!");
+            }
+  }
+
+  const getLocation = ()=>{
+    if(navigator.geolocation) {
+               
+               // timeout at 60000 milliseconds (60 seconds)
+               var options = {timeout:60000};
+               console.log(navigator.geolocation.getCurrentPosition(showLocation, errorHandler, options));
+               
+            } else {
+               alert("Sorry, browser does not support geolocation!");
+            }
+  }
+
   
 </script>
 
@@ -38,4 +64,6 @@
   {#if distance !== undefined}
     <h1>Distance between {zip1} and {zip2} is {distance} Miles</h1>
   {/if}
+
+  <input type = "button" on:click = {getLocation} value = "Get Location"/>
 </div>
