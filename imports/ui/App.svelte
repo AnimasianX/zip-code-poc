@@ -1,9 +1,19 @@
 <script>
   import { Meteor } from "meteor/meteor";
+  import Range from "./Range.svelte";
 
   let zip1;
   let zip2; 
   let distance = undefined;
+  let userZip;
+  let distanceFromUser;
+  let zipFromUserRadius;
+
+//range
+  let value = 50;
+  let theme = "default";
+
+
   const getDistance =  ()=>{
     Meteor.call("getDistanceBetweenTwoZip",zip1,zip2,(error,result)=>{
       if(error){
@@ -16,33 +26,30 @@
 
   }
 
-  const showLocation = (position) =>{
-    var latitude = position.coords.latitude;
-            var longitude = position.coords.longitude;
-            alert("Latitude : " + latitude + " Longitude: " + longitude);
+  const getDistanceFromUser =  ()=>{
+    Meteor.call("getDistanceFromUser",userZip,[11355,29414,29910],(error,result)=>{
+      if(error){
+
+      }else{
+        distanceFromUser = result.data.distances;
+        console.log(distanceFromUser);
+        zipFromUserRadius = Object.keys(distanceFromUser).filter((key)=> distanceFromUser[key] < value);
+      }
+    });
+
   }
 
-  const errorHandler = () =>{
-    if(err.code == 1) {
-               alert("Error: Access is denied!");
-            } else if( err.code == 2) {
-               alert("Error: Position is unavailable!");
-            }
-  }
+   
 
-  const getLocation = ()=>{
-    if(navigator.geolocation) {
-               
-               // timeout at 60000 milliseconds (60 seconds)
-               var options = {timeout:60000};
-               console.log(navigator.geolocation.getCurrentPosition(showLocation, errorHandler, options));
-               
-            } else {
-               alert("Sorry, browser does not support geolocation!");
-            }
+//  $: zipFromUserRadius = Object.keys(distanceFromUser).filter((key)=> distanceFromUser[key] < value);
+$m:{
+  if(zipFromUserRadius){
+  zipFromUserRadius = zipFromUserRadius;
+  zipFromUserRadius = Object.keys(distanceFromUser).filter((key)=> distanceFromUser[key] < value);
   }
-
+}
   
+
 </script>
 
 
@@ -50,20 +57,59 @@
   <label>Zip codes</label>
             <input
               type="number"
-              name="overtimeHours"
+              name="start-zip"
               bind:value={zip1}
-              placeholder="Zip code 1"
+              placeholder="Your zip code"
             />
             <input
               type="number"
-              name="overtimeMinutes"
+              name="newzip"
               bind:value={zip2}
               placeholder="Zip code 2"
             />
   <button on:click={getDistance}>Get Distance</button>
+  <br>
   {#if distance !== undefined}
     <h1>Distance between {zip1} and {zip2} is {distance} Miles</h1>
   {/if}
+  
+  <br>
+  <label>Distance from user: </label>
+  <input
+              type="number"
+              name="user-zip"
+              bind:value={userZip}
+              placeholder="Your zip code"
+            />
+  <input type = "button" on:click = {getDistanceFromUser} value = "Get Distance"/>
+  {#if distanceFromUser}
+  <ul>
+    {#each Object.keys(distanceFromUser) as zipcode}
+      <li>
+        {zipcode} : {distanceFromUser[zipcode]} Miles away
+      </li>
+    {/each}
+  </ul>
+  {/if}
 
-  <input type = "button" on:click = {getLocation} value = "Get Location"/>
-</div>
+
+<!-- Range -->
+  <div class:purple-theme={theme === "purple"}>
+    <label for="basic-range">Range Label</label>
+    <Range on:change={(e) => value = e.detail.value} id="basic-slider" />
+  </div>
+  <h3>
+    {value}
+  </h3>
+    </div>
+
+    {#if zipFromUserRadius}
+  <ul>
+    {#each zipFromUserRadius as zipcode}
+      <li>
+        {zipcode} : {distanceFromUser[zipcode]} Miles away
+      </li>
+    {/each}
+  </ul>
+  {/if}
+

@@ -11,7 +11,9 @@
     "@babel/runtime": "^7.20.6",
     "dotenv": "^16.0.3",
     "meteor-node-stubs": "^1.2.5",
-    "svelte": "^3.54.0"
+    "svelte": "^3.54.0",
+    "svelte-agnostic-draggable": "^0.1.13",
+    "svelte-touch-to-mouse": "^1.0.0"
   },
   "devDependencies": {
     "svelte-preprocess": "^5.0.0"
